@@ -26,24 +26,29 @@ class AuthController extends Controller
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             required={"name", "email", "password"},
+     *             required={"name", "email", "password","password_confirmation"},
      *             @OA\Property(property="name", type="string", example="John Doe"),
      *             @OA\Property(property="email", type="string", example="john.doe@example.com"),
-     *             @OA\Property(property="password", type="string", example="password123")
+     *             @OA\Property(property="password", type="string", example="password123"),
+     *             @OA\Property(property="password_confirmation", type="string", example="password123")
      *         )
      *     ),
      *     @OA\Response(
-     *         response=201,
-     *         description="User registered successfully",
+     *         response=200,
+     *         description="User registered successfully.",
      *         @OA\JsonContent(
      *             @OA\Property(property="id", type="integer", example=1),
      *             @OA\Property(property="name", type="string", example="John Doe"),
-     *             @OA\Property(property="email", type="string", example="john.doe@example.com")
+     *             @OA\Property(property="email", type="string", example="john.doe@example.com"),
+     *             @OA\Property(property="created_at", type="string", format="date-time", example="2024-11-07T10:00:00Z"),
+     *             @OA\Property(property="updated_at", type="string", format="date-time", example="2024-11-07T10:00:00Z"),
+     *             @OA\Property(property="access_token", type="string", example="your-jwt-token"),
+     *             @OA\Property(property="token_type", type="string", example="bearer")
      *         )
      *     ),
      *     @OA\Response(
-     *         response=422,
-     *         description="Invalid input errors"
+     *         response=400,
+     *         description="Invalid input"
      *     )
      * )
      */
@@ -98,6 +103,11 @@ class AuthController extends Controller
      *         response=200,
      *         description="User logged in successfully",
      *         @OA\JsonContent(
+     *              @OA\Property(property="id", type="integer", example=1),
+     *             @OA\Property(property="name", type="string", example="John Doe"),
+     *             @OA\Property(property="email", type="string", example="john.doe@example.com"),
+     *             @OA\Property(property="created_at", type="string", format="date-time", example="2024-11-07T10:00:00Z"),
+     *             @OA\Property(property="updated_at", type="string", format="date-time", example="2024-11-07T10:00:00Z"),
      *             @OA\Property(property="access_token", type="string", example="your-jwt-token"),
      *             @OA\Property(property="token_type", type="string", example="bearer")
      *         )
@@ -135,6 +145,7 @@ class AuthController extends Controller
 
         return response()->json([
             'error' => false,
+            'message' =>'User logged in successfully,',
             'status' => 200,
             'user' => $user,
             'token' => $token,
@@ -145,21 +156,23 @@ class AuthController extends Controller
     /**
      * @OA\Get(
      *     path="/api/user",
-     *     summary="Get the authenticated user",
-     *     tags={"Authentication"},
-     *     security={{"bearerAuth":{}}},
+     *     summary="Get authenticated user data",
+     *     security={{"sanctum": {}}},
+     *     tags={"Authenticated"},
      *     @OA\Response(
      *         response=200,
-     *         description="Authenticated user data",
+     *         description="Get authenticated user data",
      *         @OA\JsonContent(
-     *             @OA\Property(property="id", type="integer", example=1),
-     *             @OA\Property(property="name", type="string", example="John Doe"),
-     *             @OA\Property(property="email", type="string", example="john.doe@example.com")
+     *             type="array",
+     *             @OA\Items(
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="name", type="string", example="General Chat"),
+     *                 @OA\Property(property="email", type="string", example="example@example.com"),
+     *                 @OA\Property(property="email_verified_at", type="string",format="date-time", example="2024-11-07T10:00:00Z"),
+     *                 @OA\Property(property="created_at", type="string", format="date-time", example="2024-11-07T10:00:00Z"),
+     *                 @OA\Property(property="updated_at", type="string", format="date-time", example="2024-11-07T10:00:00Z")
+     *             )
      *         )
-     *     ),
-     *     @OA\Response(
-     *         response=401,
-     *         description="Unauthorized"
      *     )
      * )
      */
@@ -167,6 +180,6 @@ class AuthController extends Controller
     // Get authenticated user data
     public function user(Request $request)
     {
-        return response()->json(['error' => false,'status' => 200,'user'=>$request->user()]);
+        return response()->json(['error' => false,'status' => 200,'message'=>'Get authenticated user data','user'=>$request->user()]);
     }
 }
